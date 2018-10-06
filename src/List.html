@@ -1,0 +1,43 @@
+<div class="list">
+  {#each items as item}
+    <div class="list-item">
+      <Card title={item.title} imageUrl={item.urlToImage} />
+    </div>
+  {/each}
+</div>
+<style>
+  .list{
+    list-style-type: none;
+    display: flex;
+    width: 100vw;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .list-item{
+    /* display: inline-block; */
+    margin: 10px;
+    min-width: 400px;
+    flex: 1;
+    float: left;
+    height: 300px;
+  }
+</style>
+
+<script>
+  import Card from './Card.html'
+  
+  export default {
+    components: {
+      Card
+    },
+    data(){
+      return {
+        'items': []
+      }
+    },
+    oncreate() {
+      // console.log('List');
+			// console.log(this.options);
+		},
+  }
+</script>

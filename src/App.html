@@ -1,7 +1,113 @@
-<h1>Hello {name}!</h1>
+<div class="select-container">
+	<h1>News Headlines</h1>
+	<select on:change="set({country: this.value})">
+		<option value="in">India</option>
+		<option value="us">USA</option>
+	</select>
+	<select on:change="set({category: this.value})">
+		<option value="general">General</option>
+		<option value="business">Business</option>
+		<option value="entertainment">Entertainment</option>
+		<option value="health">Health</option>
+		<option value="science">Science</option>
+		<option value="sports">Sports</option>
+		<option value="technology">Technology</option>
+	</select>
+</div>
+<div class="container">
+	<List items={items} />
+</div>
 
 <style>
 	h1 {
 		color: purple;
 	}
+	.select-container{
+		margin: 10px;
+	}
 </style>
+<script>
+	import List from './List.html'
+
+	export default {
+		components: {
+			List
+		},
+		data() {
+			return {
+				count: 0,
+				items: [],
+				time: new Date(),
+				country: 'in',
+				category: 'general'
+			};
+		},
+		methods: {
+			addItem(e){
+				// console.log('this.get() ::',this.get());
+				let {items, count} = this.get();
+				
+				console.log('items ::', items);
+				console.log('count ::', count);
+				count++;
+				items.push(count);
+				this.set({count, items});
+			},
+
+			fetchNews(){
+				let {country, category} = this.get();
+				this.set({items: []});
+				console.log('fetchNews');
+				
+				fetch(`https://newsapi.org/v2/top-headlines?pageSize=20&country=${country}&apiKey=a6a21e07f9ef4e5fb89b5f5eab675095&category=${category}`)
+				.then((response) => {
+					return response.json();
+				})
+				.then((data) => {
+					console.log(data);
+					this.set({
+						items: data.articles
+					});
+				});
+			}
+		},
+		onstate({ changed, current, previous }) {
+			console.log('onstate => ', changed);
+			
+			// this fires before oncreate, and on every state change.
+			// the first time it runs, `previous` is undefined
+			
+			if (!previous) {
+				this.fetchNews();
+			} else if (current.country != previous.country || current.category != previous.category) {
+				this.fetchNews();
+			}
+		},
+
+		oncreate() {
+			// this fires when the component has been
+			// rendered to the DOM
+			console.log('oncreate => ', this.options);
+		},
+
+		onupdate({ changed, current, previous }) {
+			// this fires after oncreate, and after every state change
+			// once the DOM is synchronised with the data
+			console.log(`onupdate => The DOM has been updated`);
+		},
+
+		ondestroy() {
+			// this fires when the component is
+			// removed from the DOM
+			console.log('in ondestroy');
+
+			// clearInterval(this.interval);
+		},
+		computed: {
+			hours:   ({ time }) => time.getHours(),
+			minutes: ({ time }) => time.getMinutes(),
+			seconds: ({ time }) => time.getSeconds()
+		}
+
+	};
+</script>
